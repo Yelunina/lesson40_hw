@@ -68,4 +68,9 @@ public class Photo {
         return Objects.hash(albumId, photoId);
     }
 
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(albumId, photoId);
+//    }
+
 }
