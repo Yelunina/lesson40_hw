@@ -16,13 +16,14 @@ public class AlbumImpl implements Album {
         int res = p1.getDate().compareTo(p2.getDate());
         return res != 0 ? res : Integer.compare(p1.getPhotoId(), p2.getPhotoId());
     };
+
     public AlbumImpl(int capacity) {
         this.photos = new Photo[capacity];
     }
 
     @Override
     public boolean addPhoto(Photo photo) {
-        if(photo == null){
+        if (photo == null) {
             throw new RuntimeException();
         }
         if (photos.length == size
@@ -62,9 +63,8 @@ public class AlbumImpl implements Album {
 
     @Override
     public Photo getPhotoFromAlbum(int photoId, int albumId) {
-        Photo pattern = new Photo(albumId, photoId, null, null, null);
         for (int i = 0; i < size; i++) {
-            if (pattern.equals(photos[i])) {
+            if (photos[i].getPhotoId() == photoId && photos[i].getAlbumId() == albumId) {
                 return photos[i];
             }
         }
@@ -75,31 +75,26 @@ public class AlbumImpl implements Album {
     public Photo[] getAllPhotoFromAlbum(int albumId) {
         return findByPredicate(p -> p.getAlbumId() == albumId);
     }
-    // предикат проверяет совпадение ID альбомов
+
     @Override
     public Photo[] getPhotoBetweenDate(LocalDate dateFrom, LocalDate dateTo) {
-        Photo pattern = new Photo(0, Integer.MIN_VALUE, null, null, dateFrom.atStartOfDay()); // вводим объектную переменную
-        int from = -Arrays.binarySearch(photos, 0, size, pattern, comparator) -1; // находим индекс начального фото (левый край)
-//        from = from >= 0 ? from : -from - 1;
-        pattern = new Photo(0, Integer.MAX_VALUE, null, null, LocalDateTime.of(dateTo, LocalTime.MAX)); // находим правый край
-        int to = -Arrays.binarySearch(photos, 0, size, pattern, comparator) - 1;
-//        to = to >= 0 ? to : -to - 1;
-        return Arrays.copyOfRange(photos, from, to); // Range - диапазон, создаем новый массив с нужными фото
+        return findByPredicate(p -> p.getDate().toLocalDate().compareTo(dateFrom) >= 0
+                && p.getDate().toLocalDate().compareTo(dateTo) <= 0);
     }
 
     @Override
     public int size() {
         return size;
     }
-    private Photo[] findByPredicate(Predicate<Photo> predicate) { // Predicate - это условие, критерий
-        // интерфейс Predicate есть в Java, у него есть один стандартный метод - test
+
+    private Photo[] findByPredicate(Predicate<Photo> predicate) {
         Photo[] res = new Photo[size];
-        int j = 0; // счетчик найденных фото в альбоме
+        int j = 0;
         for (int i = 0; i < size; i++) {
-            if (predicate.test(photos[i])) { // проверяем имеется ли это фото в альбоме, так как мы ищем фото в альбоме
-                res[j++] = photos[i]; // формируем массив
+            if (predicate.test(photos[i])) {
+                res[j++] = photos[i];
             }
         }
-        return Arrays.copyOf(res, j); // возвращаем сформированный массив
+        return Arrays.copyOf(res, j);
     }
 }
