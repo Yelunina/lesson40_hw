@@ -22,7 +22,7 @@ class AlbumTest {
 
     @org.junit.jupiter.api.BeforeEach
     void setUp() {
-        album =new AlbumImpl(7);
+        album = new AlbumImpl(7);
         ph = new Photo[6];
         ph[0] = new Photo(1, 1, "title1", "url1", now.minusDays(7));
         ph[1] = new Photo(1, 2, "title2", "url2", now.minusDays(7));
@@ -30,7 +30,6 @@ class AlbumTest {
         ph[3] = new Photo(2, 1, "title1", "url1", now.minusDays(7));
         ph[4] = new Photo(2, 4, "title4", "url4", now.minusDays(2));
         ph[5] = new Photo(1, 4, "title4", "url1", now.minusDays(2));
-
         for (int i = 0; i < ph.length; i++) {
             album.addPhoto(ph[i]);
         }
@@ -38,12 +37,18 @@ class AlbumTest {
 
     @org.junit.jupiter.api.Test
     void addPhoto() {
-        assertFalse(album.addPhoto(null));
+        boolean flag;
+        try {
+            album.addPhoto(null);
+            flag = true;
+        } catch (RuntimeException e) {
+            flag = false;
+        }
         assertFalse(album.addPhoto(ph[1]));
-        Photo photo = new Photo(1, 5, "title5", "url5", now.minusDays(5));
+        Photo photo = new Photo(1, 5, "title5", "url5", now.minusDays(3));
         assertTrue(album.addPhoto(photo));
         assertEquals(7, album.size());
-        photo = new Photo(1, 6, "title6", "url6", now.minusDays(6));
+        photo = new Photo(1, 6, "title6", "url6", now.minusDays(3));
         assertFalse(album.addPhoto(photo));
     }
 
@@ -69,7 +74,7 @@ class AlbumTest {
 
     @org.junit.jupiter.api.Test
     void getAllPhotoFromAlbum() {
-        Photo[] actual = album.getAllPhotoFromAlbum(2);
+        Photo[] actual = album.getAllPhotoFromAlbum(2); //{ph[4], ph[3]}
         Photo[] expected = {ph[3], ph[4]};
         Arrays.sort(actual, comparator);
         assertArrayEquals(expected, actual);

@@ -10,7 +10,6 @@ public class Photo {
     private String url;
     private LocalDateTime date;
 
-
     public Photo(int albumId, int photoId, String title, String url, LocalDateTime date) {
         this.albumId = albumId;
         this.photoId = photoId;
@@ -69,8 +68,8 @@ public class Photo {
     }
 
 //    @Override
-//    public int hashCode() {
-//        return Objects.hash(albumId, photoId);
+//    public int compareTo(Photo o) {
+//        int res = Integer.compare(albumId, o.albumId);
+//        return res != 0 ? res : Integer.compare(photoId, o.photoId);
 //    }
-
 }

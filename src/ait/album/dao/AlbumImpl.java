@@ -10,20 +10,22 @@ import java.util.Comparator;
 import java.util.function.Predicate;
 
 public class AlbumImpl implements Album {
+    private Photo[] photos;
+    private int size;
     static Comparator<Photo> comparator = (p1, p2) -> {
         int res = p1.getDate().compareTo(p2.getDate());
         return res != 0 ? res : Integer.compare(p1.getPhotoId(), p2.getPhotoId());
     };
-    private Photo[] photos;
-    private int size;
-
     public AlbumImpl(int capacity) {
         this.photos = new Photo[capacity];
     }
 
     @Override
     public boolean addPhoto(Photo photo) {
-        if (photo == null || photos.length == size
+        if(photo == null){
+            throw new RuntimeException();
+        }
+        if (photos.length == size
                 || getPhotoFromAlbum(photo.getPhotoId(), photo.getAlbumId()) != null) {
             return false;
         }
@@ -34,6 +36,7 @@ public class AlbumImpl implements Album {
         size++;
         return true;
     }
+
 
     @Override
     public boolean removePhoto(int photoId, int albumId) {

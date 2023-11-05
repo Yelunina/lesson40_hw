@@ -18,5 +18,4 @@ public interface Album {
     Photo[] getPhotoBetweenDate(LocalDate dateFrom, LocalDate dateTo);
 
     int size();
-
 }
