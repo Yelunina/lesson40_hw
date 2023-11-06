@@ -37,13 +37,7 @@ class AlbumTest {
 
     @org.junit.jupiter.api.Test
     void addPhoto() {
-        boolean flag;
-        try {
-            album.addPhoto(null);
-            flag = true;
-        } catch (RuntimeException e) {
-            flag = false;
-        }
+        assertFalse(album.addPhoto(null));
         assertFalse(album.addPhoto(ph[1]));
         Photo photo = new Photo(1, 5, "title5", "url5", now.minusDays(3));
         assertTrue(album.addPhoto(photo));

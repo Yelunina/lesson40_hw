@@ -3,19 +3,12 @@ package ait.album.dao;
 import ait.album.model.Photo;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.function.Predicate;
 
 public class AlbumImpl implements Album {
     private Photo[] photos;
     private int size;
-    static Comparator<Photo> comparator = (p1, p2) -> {
-        int res = p1.getDate().compareTo(p2.getDate());
-        return res != 0 ? res : Integer.compare(p1.getPhotoId(), p2.getPhotoId());
-    };
 
     public AlbumImpl(int capacity) {
         this.photos = new Photo[capacity];
@@ -23,28 +16,19 @@ public class AlbumImpl implements Album {
 
     @Override
     public boolean addPhoto(Photo photo) {
-        if (photo == null) {
-            throw new RuntimeException();
-        }
-        if (photos.length == size
-                || getPhotoFromAlbum(photo.getPhotoId(), photo.getAlbumId()) != null) {
+        if (photo == null || size == photos.length || getPhotoFromAlbum(photo.getPhotoId(), photo.getAlbumId()) != null) {
             return false;
         }
-        int index = Arrays.binarySearch(photos, 0, size, photo, comparator);
-        index = index >= 0 ? index : -index - 1;
-        System.arraycopy(photos, index, photos, index + 1, size - index);
-        photos[index] = photo;
-        size++;
+        photos[size++] = photo;
         return true;
     }
-
 
     @Override
     public boolean removePhoto(int photoId, int albumId) {
         for (int i = 0; i < size; i++) {
             if (photos[i].getPhotoId() == photoId && photos[i].getAlbumId() == albumId) {
-                System.arraycopy(photos, i + 1, photos, i, size - 1 - i);
-                photos[--size] = null;
+                photos[i] = photos[--size];
+                photos[size] = null;
                 return true;
             }
         }
@@ -73,13 +57,13 @@ public class AlbumImpl implements Album {
 
     @Override
     public Photo[] getAllPhotoFromAlbum(int albumId) {
-        return findByPredicate(p -> p.getAlbumId() == albumId);
+        return findPhotosByPredicate(p -> p.getAlbumId() == albumId);
     }
 
     @Override
     public Photo[] getPhotoBetweenDate(LocalDate dateFrom, LocalDate dateTo) {
-        return findByPredicate(p -> p.getDate().toLocalDate().compareTo(dateFrom) >= 0
-                && p.getDate().toLocalDate().compareTo(dateTo) <= 0);
+        return findPhotosByPredicate(p -> p.getDate().toLocalDate().isAfter(dateFrom.minusDays(1)) &&
+                p.getDate().toLocalDate().isBefore(dateTo.plusDays(1)));
     }
 
     @Override
@@ -87,7 +71,7 @@ public class AlbumImpl implements Album {
         return size;
     }
 
-    private Photo[] findByPredicate(Predicate<Photo> predicate) {
+    private Photo[] findPhotosByPredicate(Predicate<Photo> predicate) {
         Photo[] res = new Photo[size];
         int j = 0;
         for (int i = 0; i < size; i++) {
